@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube MP3 변환기</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Inter 폰트 적용 */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* 로딩 스피너 애니메이션 */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6; /* Blue-500 */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg text-center transform hover:scale-105 transition-transform duration-300">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-6 tracking-tight">
+            YouTube MP3 변환기
+        </h1>
+        <p class="text-gray-600 mb-8 text-lg">
+            YouTube 동영상 URL을 입력하고 MP3로 변환해보세요.
+        </p>
+
+        <div class="mb-6">
+            <input
+                type="url"
+                id="youtubeUrl"
+                placeholder="YouTube 동영상 URL을 입력하세요 (예: https://www.youtube.com/watch?v=dQw4w9WgXcQ)"
+                class="w-full p-4 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-base"
+            >
+        </div>
+
+        <button
+            id="convertButton"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:-translate-y-1 active:scale-95 flex items-center justify-center text-lg"
+        >
+            <span id="buttonText">MP3로 변환</span>
+            <div id="loadingSpinner" class="spinner ml-3 hidden"></div>
+        </button>
+
+        <div id="resultArea" class="mt-8 p-6 bg-gray-50 border border-gray-200 rounded-lg hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">변환 결과</h2>
+            <div id="statusMessage" class="text-green-600 font-medium mb-4"></div>
+            <a id="downloadLink" href="#" target="_blank" download class="text-blue-600 hover:underline font-bold text-lg hidden">
+                MP3 다운로드 (시뮬레이션)
+            </a>
+            <p id="errorMessage" class="text-red-500 font-medium hidden"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const youtubeUrlInput = document.getElementById('youtubeUrl');
+            const convertButton = document.getElementById('convertButton');
+            const buttonText = document.getElementById('buttonText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultArea = document.getElementById('resultArea');
+            const statusMessage = document.getElementById('statusMessage');
+            const downloadLink = document.getElementById('downloadLink');
+            const errorMessage = document.getElementById('errorMessage');
+
+            convertButton.addEventListener('click', () => {
+                const url = youtubeUrlInput.value.trim();
+
+                // 결과 영역 초기화
+                resultArea.classList.add('hidden');
+                statusMessage.textContent = '';
+                downloadLink.classList.add('hidden');
+                downloadLink.href = '#';
+                errorMessage.classList.add('hidden');
+                errorMessage.textContent = '';
+
+                if (!url) {
+                    errorMessage.textContent = 'YouTube URL을 입력해주세요.';
+                    errorMessage.classList.remove('hidden');
+                    resultArea.classList.remove('hidden');
+                    return;
+                }
+
+                // 간단한 URL 유효성 검사 (YouTube URL인지 확인)
+                // 실제로는 더 복잡한 정규식이 필요할 수 있습니다.
+                const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
+                if (!youtubeRegex.test(url)) {
+                    errorMessage.textContent = '유효한 YouTube URL이 아닙니다.';
+                    errorMessage.classList.remove('hidden');
+                    resultArea.classList.remove('hidden');
+                    return;
+                }
+
+                // 로딩 상태 표시
+                buttonText.textContent = '변환 중...';
+                loadingSpinner.classList.remove('hidden');
+                convertButton.disabled = true;
+                convertButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                convertButton.classList.add('bg-blue-400', 'cursor-not-allowed');
+
+                // 실제 변환 로직 대신 시뮬레이션
+                setTimeout(() => {
+                    // 시뮬레이션 성공 시
+                    const mockFileName = `mock_youtube_audio_${Date.now()}.mp3`;
+                    statusMessage.textContent = '성공적으로 변환되었습니다!';
+                    downloadLink.textContent = `${mockFileName} 다운로드 (시뮬레이션)`;
+                    // 실제 다운로드 링크는 백엔드에서 생성된 URL이 와야 합니다.
+                    // 여기서는 임시적인 더미 링크를 제공합니다.
+                    downloadLink.href = '#'; // 실제 파일이 없으므로 링크는 동작하지 않습니다.
+                    downloadLink.classList.remove('hidden');
+
+                    // 시뮬레이션 실패 시 (예시)
+                    // errorMessage.textContent = '변환에 실패했습니다. 다시 시도해주세요.';
+                    // errorMessage.classList.remove('hidden');
+                    // statusMessage.classList.add('hidden'); // 성공 메시지 숨기기
+
+                    // 상태 초기화
+                    buttonText.textContent = 'MP3로 변환';
+                    loadingSpinner.classList.add('hidden');
+                    convertButton.disabled = false;
+                    convertButton.classList.remove('bg-blue-400', 'cursor-not-allowed');
+                    convertButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+
+                    resultArea.classList.remove('hidden');
+                }, 2000); // 2초 후 완료 시뮬레이션
+            });
+        });
+    </script>
+</body>
+</html>
